@@ -1,16 +1,24 @@
 
 #Python
 from typing import Optional
+from enum import Enum
 
 #Pydantic
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from fastapi import FastAPI
-from fastapi import Body, Query, Path
+from fastapi import FastAPI,Body, Query, Path
 
 app = FastAPI()
 
 # Models
+
+class HairColor(Enum):
+    white = 'white'
+    brown = 'brown'
+    black = 'black'
+    blonde = 'blonde'
+    red = 'red'
+
 
 class Location(BaseModel):
     city: str
@@ -18,16 +26,28 @@ class Location(BaseModel):
     country: str
 
 class Person(BaseModel):
-    first_name: str 
-    last_name: str
-    age: int
-    hair_color: Optional[str] = None
-    is_married: Optional[bool] = None
+    first_name: str = Field(
+            ...,
+            min_length=1,
+            max_length=50
+        )
+    last_name: str = Field(
+            ...,
+            min_length=1,
+            max_length=50
+        )
+    age: int = Field(
+            ...,
+            gt=0,
+            le=115
+        )
+    hair_color: Optional[HairColor] = Field(default=None)
+    is_married: Optional[bool] = Field(default=None)
 
 
 @app.get('/')
 def home():
-    return {"Hello":"World"}
+    return {'Hello':'World'}
 
 # Request and Response Body
 
@@ -62,11 +82,11 @@ def show_person(
     person_id: int = Path(
         ...,
         ge=1,
-        title="Person Id",
+        title='Person Id',
         description="This is the person id. It's greated or equals than 1"
         )
     ):
-    return {person_id: "It exists!"}
+    return {person_id: 'It exists!'}
 
 
 #Validations: Request Body
@@ -76,7 +96,7 @@ def update_person(
     person_id: int = Path(
         ...,
         title='Person Id',
-        description="This is the person id.",
+        description='This is the person id.',
         ge=1
     ),
     person: Person = Body(...),
