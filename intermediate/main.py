@@ -1,12 +1,13 @@
 
 #Python
+from importlib.resources import path
 from typing import Optional
 from enum import Enum
 
 #Pydantic
 from pydantic import BaseModel, Field
 
-from fastapi import FastAPI,status,Body, Query, Path
+from fastapi import FastAPI,status,Body, Query, Path, Form
 
 app = FastAPI()
 
@@ -48,12 +49,14 @@ class PersonBase(BaseModel):
     hair_color: Optional[HairColor] = Field(default=None, example=HairColor.black)
     is_married: Optional[bool] = Field(default=None, example=False)
 
+class Person(PersonBase):
+    password: str = Field(...,min_length=8)
 class PersonOut(PersonBase):
     pass
 
 
-class Person(PersonBase):
-    password: str = Field(...,min_length=8)
+class LoginOut(BaseModel):
+    username: str = Field(...,max_length=20,example='miguel2021')
 
     # class Config:
     #     schema_extra = {
@@ -142,3 +145,12 @@ def update_person(
     # results.update(location.dict())
 
     return person
+
+
+@app.post(
+        path='/login',
+        response_model=LoginOut,
+        status_code=status.HTTP_200_OK
+    )
+def login(username: str = Form(...), password: str = Form(...)):
+    return LoginOut(username=username)
