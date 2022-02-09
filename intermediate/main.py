@@ -75,7 +75,8 @@ class LoginOut(BaseModel):
 
 @app.get(
     path='/',
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    tags=['Home']
     )
 def home():
     return {'Hello':'World'}
@@ -85,7 +86,8 @@ def home():
 @app.post(
     path='/person/new',
     response_model=PersonOut,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    tags=['People']
     )
 def create_person(person: Person = Body(...)):
     return person
@@ -94,7 +96,8 @@ def create_person(person: Person = Body(...)):
 
 @app.get(
     path='/person/detail',
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    tags=['People']
     )
 def show_person(
     name: Optional[str] = Query(
@@ -118,7 +121,7 @@ def show_person(
 #Validations: Path Parameters
 PEOPLE = [1,2,3,4,5]
 
-@app.get('/person/detail/{person_id}')
+@app.get('/person/detail/{person_id}',tags=['People'])
 def show_person(
     person_id: int = Path(
         ...,
@@ -138,7 +141,7 @@ def show_person(
 
 #Validations: Request Body
 
-@app.put('/person/{person_id}')
+@app.put('/person/{person_id}',tags=['People'])
 def update_person(
     person_id: int = Path(
         ...,
@@ -159,7 +162,8 @@ def update_person(
 @app.post(
         path='/login',
         response_model=LoginOut,
-        status_code=status.HTTP_200_OK
+        status_code=status.HTTP_200_OK,
+        tags=['People','Auth']
     )
 def login(username: str = Form(...), password: str = Form(...)):
     return LoginOut(username=username)
@@ -169,7 +173,8 @@ def login(username: str = Form(...), password: str = Form(...)):
 
 @app.post(
     path='/contact',
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    tags=['Contacts']
 )
 def contact(
     first_name: str = Form(
@@ -195,7 +200,8 @@ def contact(
 #files
 
 @app.post(
-    path= '/post-image'
+    path= '/post-image',
+    tags = ['Files']
 )
 def post_image(
     image: UploadFile = File(...)
